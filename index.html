@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#FFF7FA">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Extrato">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Meu Extrato</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23FF82AF'/%3E%3Cstop offset='1' stop-color='%23E0447D'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' fill='url(%23g)'/%3E%3Ccircle cx='50' cy='52' r='28' fill='%23ffffff' fill-opacity='0.18'/%3E%3Ctext x='50' y='69' font-family='Arial' font-weight='bold' font-size='54' text-anchor='middle' fill='white'%3E%24%3C/text%3E%3C/svg%3E">
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html {
+    color-scheme: light only;
+    background: #FFF7FA;
+  }
+  html, body {
+    margin: 0; padding: 0; min-height: 100%;
+    background: #FFF7FA;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    color: #3A2E33;
+    overscroll-behavior: none;
+  }
+  #app {
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: #FFF7FA;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: calc(78px + env(safe-area-inset-bottom));
+  }
+  header {
+    padding: calc(18px + env(safe-area-inset-top)) 20px 8px;
+    text-align: center;
+  }
+  header .title {
+    font-size: 13px;
+    letter-spacing: 2px;
+    font-weight: 700;
+    color: #E0447D;
+  }
+  .month-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    padding: 10px 0 4px;
+  }
+  .month-nav button {
+    background: none; border: none;
+    font-size: 20px;
+    color: #E0447D;
+    padding: 6px 10px;
+    cursor: pointer;
+  }
+  .month-nav .month-label {
+    font-size: 15px;
+    font-weight: 600;
+    min-width: 130px;
+    text-align: center;
+    text-transform: capitalize;
+  }
+  .total-card {
+    margin: 10px 20px 0;
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 22px 20px;
+    text-align: center;
+    box-shadow: 0 4px 18px rgba(201,123,146,0.10);
+  }
+  .total-card .label {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: #D14E82;
+    font-weight: 700;
+  }
+  .total-card .value {
+    font-size: 34px;
+    font-weight: 700;
+    color: #E0447D;
+    margin-top: 6px;
+  }
+  .empty-msg {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #C97BA0;
+  }
+  section {
+    margin: 22px 20px 0;
+  }
+  .section-title {
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    font-weight: 700;
+    color: #E0447D;
+    margin-bottom: 10px;
+  }
+  .tema-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #FFFFFF;
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 8px rgba(201,123,146,0.06);
+  }
+  .tema-row .nome {
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .tema-row .barra-wrap {
+    flex: 1;
+    height: 6px;
+    background: #FFE1EC;
+    border-radius: 4px;
+    margin: 0 12px;
+    overflow: hidden;
+  }
+  .tema-row .barra {
+    height: 100%;
+    background: #FF6FA0;
+    border-radius: 4px;
+  }
+  .tema-row .valor {
+    font-size: 13px;
+    font-weight: 700;
+    color: #3A2E33;
+    white-space: nowrap;
+  }
+  .formas-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .forma-card {
+    background: #FFFFFF;
+    border-radius: 16px;
+    padding: 14px 6px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(201,123,146,0.06);
+  }
+  .forma-card .emoji { font-size: 19px; }
+  .forma-card .nome {
+    font-size: 10.5px;
+    letter-spacing: 0.5px;
+    color: #C97BA0;
+    font-weight: 700;
+    margin-top: 5px;
+  }
+  .forma-card .valor {
+    font-size: 14px;
+    font-weight: 700;
+    color: #3A2E33;
+    margin-top: 3px;
+  }
+  .donut-wrap {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    background: #FFFFFF;
+    border-radius: 18px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(201,123,146,0.06);
+  }
+  .donut {
+    position: relative;
+    width: 104px;
+    height: 104px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: background 0.3s ease;
+  }
+  .donut-hole {
+    position: absolute;
+    inset: 17px;
+    background: #FFFFFF;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4px;
+  }
+  .donut-hole span {
+    font-size: 12px;
+    font-weight: 700;
+    color: #3A2E33;
+    line-height: 1.25;
+  }
+  .legenda { flex: 1; min-width: 0; }
+  .legenda-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 7px;
+    font-size: 12.5px;
+  }
+  .legenda-item:last-child { margin-bottom: 0; }
+  .legenda-dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .legenda-nome {
+    flex: 1;
+    font-weight: 600;
+    color: #3A2E33;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .legenda-valor {
+    font-weight: 700;
+    color: #B24A78;
+    white-space: nowrap;
+  }
+  .lancamento {
+    background: #FFFFFF;
+    border-radius: 14px;
+    padding: 13px 14px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(201,123,146,0.06);
+  }
+  .lancamento .info .desc {
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .lancamento .info .meta {
+    font-size: 12px;
+    color: #C97BA0;
+    margin-top: 2px;
+  }
+  .lancamento .valor {
+    font-size: 15px;
+    font-weight: 700;
+    color: #E0447D;
+  }
+  .lancamento .del {
+    background: none;
+    border: none;
+    color: #F0A8C4;
+    font-size: 16px;
+    margin-left: 10px;
+    cursor: pointer;
+  }
+  .vazio-lista {
+    text-align: center;
+    color: #E39BBE;
+    font-size: 13px;
+    padding: 18px 0;
+  }
+  nav.tabbar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid #FFD6E4;
+    display: flex;
+    max-width: 480px;
+    margin: 0 auto;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  nav.tabbar button {
+    flex: 1;
+    border: none;
+    background: none;
+    padding: 12px 0 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #E39BBE;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+  }
+  nav.tabbar button.ativo { color: #E0447D; }
+  nav.tabbar button .icon { font-size: 19px; }
+
+  .sheet-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(58,46,51,0.35);
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 20;
+  }
+  .sheet-backdrop.aberto { display: flex; }
+  .sheet {
+    background: #FFF7FA;
+    width: 100%;
+    max-width: 480px;
+    border-radius: 24px 24px 0 0;
+    padding: 20px 20px calc(24px + env(safe-area-inset-bottom));
+    animation: subir 0.22s ease-out;
+  }
+  @keyframes subir { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .sheet h2 {
+    font-size: 16px;
+    text-align: center;
+    margin: 4px 0 18px;
+    color: #3A2E33;
+  }
+  .campo { margin-bottom: 14px; }
+  .campo label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 1px;
+    font-weight: 700;
+    color: #D14E82;
+    margin-bottom: 6px;
+  }
+  .campo input, .campo select {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid #FFD6E4;
+    background: #FFFFFF;
+    font-size: 15px;
+    color: #3A2E33;
+    font-family: inherit;
+    color-scheme: light only;
+  }
+  .campo input:focus, .campo select:focus { outline: none; border-color: #FF6FA0; }
+  .categorias {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 9px;
+  }
+  .categorias .cat {
+    padding: 12px 6px;
+    border-radius: 16px;
+    background: #FFFFFF;
+    border: 1.5px solid #FFD6E4;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #B24A78;
+    cursor: pointer;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+  }
+  .categorias .cat .emoji { font-size: 18px; }
+  .categorias .cat:active { transform: scale(0.94); }
+  .categorias .cat.sel {
+    background: #FF6FA0;
+    border-color: #FF6FA0;
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(255,111,160,0.35);
+  }
+  .campo textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid #FFD6E4;
+    background: #FFFFFF;
+    font-size: 14px;
+    color: #3A2E33;
+    font-family: inherit;
+    resize: none;
+    min-height: 58px;
+    color-scheme: light only;
+  }
+  .campo textarea:focus { outline: none; border-color: #FF6FA0; }
+  .campo .opcional {
+    font-weight: 500;
+    color: #E39BBE;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .btn-salvar {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #FF6FA0, #E0447D);
+    color: #FFFFFF;
+    font-size: 15px;
+    font-weight: 700;
+    margin-top: 6px;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+  }
+  .btn-salvar:active { transform: scale(0.97); }
+  .btn-fechar {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    background: none;
+    color: #C97BA0;
+    font-size: 14px;
+    margin-top: 6px;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <div class="title">♡ CONTROLE DE GASTOS</div>
+    <div class="month-nav">
+      <button id="mesAnterior">‹</button>
+      <div class="month-label" id="mesLabel">—</div>
+      <button id="mesProximo">›</button>
+    </div>
+  </header>
+
+  <div class="total-card">
+    <div class="label">TOTAL GASTO NO MÊS</div>
+    <div class="value" id="totalMes">R$ 0,00</div>
+    <div class="empty-msg" id="msgVazio">nenhum gasto lançado ainda</div>
+  </div>
+
+  <section id="secFormas" style="display:none;">
+    <div class="section-title">FORMAS DE PAGAMENTO</div>
+    <div class="formas-grid" id="listaFormas"></div>
+  </section>
+
+  <section id="secTemas" style="display:none;">
+    <div class="section-title">✦ PRINCIPAIS CATEGORIAS</div>
+    <div class="donut-wrap">
+      <div class="donut" id="donutChart"><div class="donut-hole"><span id="donutTexto"></span></div></div>
+      <div class="legenda" id="listaTemas"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title">LANÇAMENTOS</div>
+    <div id="listaLancamentos"></div>
+  </section>
+
+  <nav class="tabbar">
+    <button class="ativo" id="tabInicio"><span class="icon">⌂</span>Início</button>
+    <button id="tabLancar"><span class="icon">＋</span>Lançar</button>
+  </nav>
+
+</div>
+
+<div class="sheet-backdrop" id="sheetBackdrop">
+  <div class="sheet">
+    <h2>Novo lançamento</h2>
+    <div class="campo">
+      <label>DESCRIÇÃO</label>
+      <input type="text" id="inDesc" placeholder="Ex. mercado, uber, farmácia">
+    </div>
+    <div class="campo">
+      <label>VALOR</label>
+      <input type="number" id="inValor" placeholder="0,00" inputmode="decimal" step="0.01">
+    </div>
+    <div class="campo">
+      <label>DATA</label>
+      <input type="date" id="inData">
+    </div>
+    <div class="campo">
+      <label>CATEGORIA</label>
+      <div class="categorias" id="listaCategorias"></div>
+    </div>
+    <div class="campo">
+      <label>FORMA DE PAGAMENTO</label>
+      <div class="categorias" id="listaFormasOpcoes"></div>
+    </div>
+    <div class="campo">
+      <label>NOTA <span class="opcional">(opcional)</span></label>
+      <textarea id="inNota" placeholder="Um breve resumo do que se trata"></textarea>
+    </div>
+    <button class="btn-salvar" id="btnSalvar">Salvar lançamento</button>
+    <button class="btn-fechar" id="btnFechar">Cancelar</button>
+  </div>
+</div>
+
+<script>
+  const CATEGORIAS = [
+    { nome: "Alimentação", emoji: "🍽️" },
+    { nome: "Transporte", emoji: "🚗" },
+    { nome: "Lazer", emoji: "🎈" },
+    { nome: "Saúde", emoji: "💊" },
+    { nome: "Casa", emoji: "🏠" },
+    { nome: "Compras", emoji: "🛍️" },
+    { nome: "Outros", emoji: "✦" }
+  ];
+  const FORMAS = [
+    { nome: "Crédito", emoji: "💳" },
+    { nome: "VR", emoji: "🎫" },
+    { nome: "Pix", emoji: "⚡" }
+  ];
+  const PALETA_CATEGORIAS = ["#FF6FA0", "#E0447D", "#FFB6D0", "#B24A78", "#D14E82", "#F4C1DA"];
+  const CHAVE = "extratoGastos_v1";
+  let gastos = JSON.parse(localStorage.getItem(CHAVE) || "[]");
+  let dataRef = new Date();
+  let categoriaSelecionada = CATEGORIAS[0].nome;
+  let formaSelecionada = FORMAS[0].nome;
+
+  const mesLabel = document.getElementById("mesLabel");
+  const totalMesEl = document.getElementById("totalMes");
+  const msgVazio = document.getElementById("msgVazio");
+  const listaLancamentos = document.getElementById("listaLancamentos");
+  const secTemas = document.getElementById("secTemas");
+  const listaTemas = document.getElementById("listaTemas");
+  const secFormas = document.getElementById("secFormas");
+  const listaFormas = document.getElementById("listaFormas");
+  const donutChart = document.getElementById("donutChart");
+  const donutTexto = document.getElementById("donutTexto");
+
+  function salvar() {
+    localStorage.setItem(CHAVE, JSON.stringify(gastos));
+  }
+
+  function formatarMoeda(v) {
+    return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  }
+
+  function gastosDoMes() {
+    const ano = dataRef.getFullYear();
+    const mes = dataRef.getMonth();
+    return gastos.filter(g => {
+      const d = new Date(g.data + "T00:00:00");
+      return d.getFullYear() === ano && d.getMonth() === mes;
+    });
+  }
+
+  function render() {
+    mesLabel.textContent = dataRef.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+
+    const doMes = gastosDoMes().sort((a,b) => b.data.localeCompare(a.data));
+    const total = doMes.reduce((s,g) => s + g.valor, 0);
+    totalMesEl.textContent = formatarMoeda(total);
+    msgVazio.style.display = doMes.length === 0 ? "block" : "none";
+
+    if (doMes.length === 0) {
+      listaLancamentos.innerHTML = '<div class="vazio-lista">nenhum lançamento neste mês</div>';
+
+      listaFormas.innerHTML = FORMAS.map(f => `
+        <div class="forma-card">
+          <div class="emoji">${f.emoji}</div>
+          <div class="nome">${f.nome.toUpperCase()}</div>
+          <div class="valor">R$ 0,00</div>
+        </div>
+      `).join("");
+      secFormas.style.display = "block";
+
+      donutChart.style.background = "#FFE1EC";
+      donutTexto.innerHTML = "R$ 0,00";
+      listaTemas.innerHTML = '<div class="vazio-lista" style="padding:0;">lance um gasto para ver as categorias</div>';
+      secTemas.style.display = "block";
+    } else {
+      listaLancamentos.innerHTML = doMes.map(g => {
+        const d = new Date(g.data + "T00:00:00");
+        const dataFmt = d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+        return `<div class="lancamento">
+          <div class="info">
+            <div class="desc">${g.desc}</div>
+            <div class="meta">${g.categoria} · ${g.forma || "—"} · ${dataFmt}</div>
+            ${g.nota ? `<div class="meta" style="margin-top:2px; color:#B24A78;">${g.nota}</div>` : ""}
+          </div>
+          <div style="display:flex; align-items:center;">
+            <div class="valor">${formatarMoeda(g.valor)}</div>
+            <button class="del" data-id="${g.id}">✕</button>
+          </div>
+        </div>`;
+      }).join("");
+
+      // formas de pagamento
+      const porForma = {};
+      FORMAS.forEach(f => { porForma[f.nome] = 0; });
+      doMes.forEach(g => {
+        const f = g.forma || "Outra";
+        porForma[f] = (porForma[f] || 0) + g.valor;
+      });
+      listaFormas.innerHTML = FORMAS.map(f => `
+        <div class="forma-card">
+          <div class="emoji">${f.emoji}</div>
+          <div class="nome">${f.nome.toUpperCase()}</div>
+          <div class="valor">${formatarMoeda(porForma[f.nome] || 0)}</div>
+        </div>
+      `).join("");
+      secFormas.style.display = "block";
+
+      // categorias em gráfico de rosca
+      const porCategoria = {};
+      doMes.forEach(g => { porCategoria[g.categoria] = (porCategoria[g.categoria] || 0) + g.valor; });
+      let entradas = Object.entries(porCategoria).sort((a,b) => b[1] - a[1]);
+      const principais = entradas.slice(0, 5);
+      const restoTotal = entradas.slice(5).reduce((s,[,v]) => s + v, 0);
+      if (restoTotal > 0) principais.push(["Outras categorias", restoTotal]);
+
+      let anguloAtual = 0;
+      const stops = principais.map(([nome, valor], i) => {
+        const cor = PALETA_CATEGORIAS[i % PALETA_CATEGORIAS.length];
+        const fatia = (valor / total) * 360;
+        const inicio = anguloAtual;
+        const fim = anguloAtual + fatia;
+        anguloAtual = fim;
+        return { cor, texto: `${cor} ${inicio}deg ${fim}deg` };
+      });
+      donutChart.style.background = `conic-gradient(${stops.map(s => s.texto).join(", ")})`;
+      donutTexto.innerHTML = `${formatarMoeda(total).replace("R$", "R$ ")}`;
+
+      listaTemas.innerHTML = principais.map(([nome, valor], i) => {
+        const pct = Math.round((valor / total) * 100);
+        return `<div class="legenda-item">
+          <div class="legenda-dot" style="background:${PALETA_CATEGORIAS[i % PALETA_CATEGORIAS.length]}"></div>
+          <div class="legenda-nome">${nome}</div>
+          <div class="legenda-valor">${pct}%</div>
+        </div>`;
+      }).join("");
+      secTemas.style.display = "block";
+
+      document.querySelectorAll(".del").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          const id = e.currentTarget.getAttribute("data-id");
+          gastos = gastos.filter(g => g.id !== id);
+          salvar();
+          render();
+        });
+      });
+    }
+  }
+
+  document.getElementById("mesAnterior").addEventListener("click", () => {
+    dataRef.setMonth(dataRef.getMonth() - 1);
+    render();
+  });
+  document.getElementById("mesProximo").addEventListener("click", () => {
+    dataRef.setMonth(dataRef.getMonth() + 1);
+    render();
+  });
+
+  const sheetBackdrop = document.getElementById("sheetBackdrop");
+  const listaCategorias = document.getElementById("listaCategorias");
+  listaCategorias.innerHTML = CATEGORIAS.map(c =>
+    `<div class="cat${c.nome === categoriaSelecionada ? " sel" : ""}" data-cat="${c.nome}">
+      <span class="emoji">${c.emoji}</span>${c.nome}
+    </div>`
+  ).join("");
+  listaCategorias.querySelectorAll(".cat").forEach(el => {
+    el.addEventListener("click", () => {
+      categoriaSelecionada = el.getAttribute("data-cat");
+      listaCategorias.querySelectorAll(".cat").forEach(c => c.classList.remove("sel"));
+      el.classList.add("sel");
+    });
+  });
+
+  const listaFormasOpcoes = document.getElementById("listaFormasOpcoes");
+  listaFormasOpcoes.innerHTML = FORMAS.map(f =>
+    `<div class="cat${f.nome === formaSelecionada ? " sel" : ""}" data-forma="${f.nome}">
+      <span class="emoji">${f.emoji}</span>${f.nome}
+    </div>`
+  ).join("");
+  listaFormasOpcoes.querySelectorAll(".cat").forEach(el => {
+    el.addEventListener("click", () => {
+      formaSelecionada = el.getAttribute("data-forma");
+      listaFormasOpcoes.querySelectorAll(".cat").forEach(c => c.classList.remove("sel"));
+      el.classList.add("sel");
+    });
+  });
+
+  function abrirSheet() {
+    document.getElementById("inDesc").value = "";
+    document.getElementById("inValor").value = "";
+    document.getElementById("inData").value = new Date().toISOString().slice(0,10);
+    document.getElementById("inNota").value = "";
+    categoriaSelecionada = CATEGORIAS[0].nome;
+    listaCategorias.querySelectorAll(".cat").forEach(c => c.classList.remove("sel"));
+    listaCategorias.querySelector(`[data-cat="${CATEGORIAS[0].nome}"]`).classList.add("sel");
+    formaSelecionada = FORMAS[0].nome;
+    listaFormasOpcoes.querySelectorAll(".cat").forEach(c => c.classList.remove("sel"));
+    listaFormasOpcoes.querySelector(`[data-forma="${FORMAS[0].nome}"]`).classList.add("sel");
+    sheetBackdrop.classList.add("aberto");
+  }
+  function fecharSheet() {
+    sheetBackdrop.classList.remove("aberto");
+  }
+
+  document.getElementById("tabLancar").addEventListener("click", abrirSheet);
+  document.getElementById("btnFechar").addEventListener("click", fecharSheet);
+  sheetBackdrop.addEventListener("click", (e) => {
+    if (e.target === sheetBackdrop) fecharSheet();
+  });
+  document.getElementById("tabInicio").addEventListener("click", () => {
+    document.getElementById("tabInicio").classList.add("ativo");
+    document.getElementById("tabLancar").classList.remove("ativo");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  document.getElementById("btnSalvar").addEventListener("click", () => {
+    const desc = document.getElementById("inDesc").value.trim();
+    const valor = parseFloat(document.getElementById("inValor").value);
+    const data = document.getElementById("inData").value;
+    const nota = document.getElementById("inNota").value.trim();
+    if (!desc || !valor || !data) {
+      alert("Preencha descrição, valor e data.");
+      return;
+    }
+    gastos.push({
+      id: Date.now().toString(36),
+      desc, valor, data, nota,
+      categoria: categoriaSelecionada,
+      forma: formaSelecionada
+    });
+    salvar();
+    fecharSheet();
+    dataRef = new Date(data + "T00:00:00");
+    render();
+  });
+
+  render();
+</script>
+</body>
+</html>
+
